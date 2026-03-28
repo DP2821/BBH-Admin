@@ -12,4 +12,23 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
+// ── Fix: HashRouter + Supabase OAuth hash conflict ──────────────────
+// Supabase OAuth redirects with tokens in the hash: #access_token=...
+// HashRouter also uses the hash for routing (#/login, #/dashboard).
+// When both try to use the hash, Supabase can't detect the tokens.
+// This interceptor runs BEFORE the app renders to extract the tokens
+// and move them into the URL query string so Supabase can parse them.
+if (window.location.hash && window.location.hash.includes('access_token')) {
+  const hashContent = window.location.hash.substring(1); // remove the '#'
+
+  // Check if it's Supabase auth tokens (not a HashRouter route)
+  if (hashContent.includes('access_token=') && hashContent.includes('token_type=')) {
+    console.log('[Supabase] Detected OAuth tokens in hash, converting for session exchange...');
+
+    // Replace the URL: move hash params to query string so Supabase picks them up
+    const newUrl = window.location.pathname + '?' + hashContent;
+    window.history.replaceState(null, '', newUrl);
+  }
+}
+
 export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '');
