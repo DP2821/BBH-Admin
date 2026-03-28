@@ -17,6 +17,15 @@ export function AuthProvider({ children }) {
     } = supabase.auth.onAuthStateChange(async (event, newSession) => {
       console.log('[Auth] Event:', event, 'Session:', !!newSession);
 
+      // After Supabase parses the session, clean the tokens from the URL
+      if (newSession && (window.location.search.includes('access_token') || window.location.hash.includes('access_token'))) {
+        // We preserve HashRouter's actual hash (e.g. #/dashboard) but strip the query params
+        const cleanHash = window.location.hash.includes('access_token') ? '' : window.location.hash;
+        const cleanUrl = window.location.pathname + cleanHash;
+        window.history.replaceState(null, '', cleanUrl);
+        console.log('[Auth] URL cleaned of sensitive auth tokens.');
+      }
+
       setSession(newSession);
 
       if (newSession?.user) {

@@ -34,12 +34,3 @@ if (window.location.hash && window.location.hash.includes('access_token')) {
 }
 
 export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '');
-
-// Clean up the URL: After Supabase client is initialized, it has already
-// parsed the tokens from the URL. We remove the query string now to keep
-// the URL clean and hide the sensitive tokens.
-if (hadAuthParams || (window.location.search && window.location.search.includes('access_token'))) {
-  const cleanUrl = window.location.pathname + (window.location.hash || '');
-  window.history.replaceState(null, '', cleanUrl);
-  console.log('[Supabase] URL cleaned of sensitive auth tokens.');
-}
