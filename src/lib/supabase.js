@@ -18,17 +18,28 @@ if (!supabaseUrl || !supabaseAnonKey) {
 // When both try to use the hash, Supabase can't detect the tokens.
 // This interceptor runs BEFORE the app renders to extract the tokens
 // and move them into the URL query string so Supabase can parse them.
+let hadAuthParams = false;
 if (window.location.hash && window.location.hash.includes('access_token')) {
   const hashContent = window.location.hash.substring(1); // remove the '#'
 
   // Check if it's Supabase auth tokens (not a HashRouter route)
   if (hashContent.includes('access_token=') && hashContent.includes('token_type=')) {
     console.log('[Supabase] Detected OAuth tokens in hash, converting for session exchange...');
+    hadAuthParams = true;
 
-    // Replace the URL: move hash params to query string so Supabase picks them up
+    // Move hash params to query string temporarily so Supabase picks them up
     const newUrl = window.location.pathname + '?' + hashContent;
     window.history.replaceState(null, '', newUrl);
   }
 }
 
 export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '');
+
+// Clean up the URL: After Supabase client is initialized, it has already
+// parsed the tokens from the URL. We remove the query string now to keep
+// the URL clean and hide the sensitive tokens.
+if (hadAuthParams || (window.location.search && window.location.search.includes('access_token'))) {
+  const cleanUrl = window.location.pathname + (window.location.hash || '');
+  window.history.replaceState(null, '', cleanUrl);
+  console.log('[Supabase] URL cleaned of sensitive auth tokens.');
+}
