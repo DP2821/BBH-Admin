@@ -1,0 +1,34 @@
+.dashboard {
+  animation: fadeIn 0.3s ease;
+}
+
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.page-subtitle {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.stat-card .stat-icon {
+  margin-bottom: 0.75rem;
+}
+
+.stat-card-overlap {
+  border-color: rgba(249, 115, 22, 0.3) !important;
+  animation: pulse-badge 2s infinite;
+}
