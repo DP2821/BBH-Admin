@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useToast } from '../contexts/ToastContext';
-import { User, Shield, Search, UserCheck, UserX } from 'lucide-react';
+import { User, Shield, Search, UserCheck, UserX, Link2, X } from 'lucide-react';
 
 export default function UserManagement() {
   const toast = useToast();
@@ -9,19 +9,34 @@ export default function UserManagement() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Person mapping
+  const [unmappedPersons, setUnmappedPersons] = useState([]);
+  const [showMapModal, setShowMapModal] = useState(false);
+  const [mappingUserId, setMappingUserId] = useState(null);
+  const [selectedPersonId, setSelectedPersonId] = useState('');
+  const [personSearch, setPersonSearch] = useState('');
+
   useEffect(() => {
     fetchUsers();
   }, []);
 
   async function fetchUsers() {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*, assignments!assignments_user_id_fkey(count)')
-        .order('created_at', { ascending: false });
+      const [usersRes, personsRes] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('*, assignments!assignments_user_id_fkey(count)')
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('persons')
+          .select('id, full_name, mobile, village')
+          .is('mapped_profile_id', null)
+          .order('full_name'),
+      ]);
 
-      if (error) throw error;
-      setUsers(data || []);
+      if (usersRes.error) throw usersRes.error;
+      setUsers(usersRes.data || []);
+      setUnmappedPersons(personsRes.data || []);
     } catch (err) {
       toast.error('Failed to load users');
       console.error(err);
@@ -49,6 +64,43 @@ export default function UserManagement() {
       console.error(err);
     }
   }
+
+  function openMapModal(userId) {
+    setMappingUserId(userId);
+    setSelectedPersonId('');
+    setPersonSearch('');
+    setShowMapModal(true);
+  }
+
+  async function handleMapPerson() {
+    if (!mappingUserId || !selectedPersonId) {
+      toast.warning('Please select a person to map');
+      return;
+    }
+    try {
+      const { error } = await supabase.rpc('map_person_to_profile', {
+        target_person_id: selectedPersonId,
+        target_profile_id: mappingUserId,
+      });
+      if (error) throw error;
+      toast.success('Person mapped to this user! Their assignments are now linked.');
+      setShowMapModal(false);
+      fetchUsers();
+    } catch (err) {
+      toast.error('Failed to map person');
+      console.error(err);
+    }
+  }
+
+  const filteredPersonsForModal = unmappedPersons.filter((p) => {
+    if (!personSearch) return true;
+    const s = personSearch.toLowerCase();
+    return (
+      (p.full_name || '').toLowerCase().includes(s) ||
+      (p.mobile || '').includes(s) ||
+      (p.village || '').toLowerCase().includes(s)
+    );
+  });
 
   const filteredUsers = users.filter((u) => {
     const search = searchQuery.toLowerCase();
@@ -147,6 +199,17 @@ export default function UserManagement() {
                           <><UserCheck size={14} /> Make Admin</>
                         )}
                       </button>
+                      {unmappedPersons.length > 0 && (
+                        <button
+                          className="btn-secondary btn-sm"
+                          onClick={() => openMapModal(u.id)}
+                          title="Map a person to this user"
+                          id={`map-person-to-${u.id}`}
+                          style={{ marginLeft: '0.375rem' }}
+                        >
+                          <Link2 size={14} /> Map Person
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -155,6 +218,86 @@ export default function UserManagement() {
           </div>
         )}
       </div>
+
+      {/* Map Person Modal */}
+      {showMapModal && (
+        <div className="modal-overlay" onClick={() => setShowMapModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>Map Person to User</h2>
+              <button onClick={() => setShowMapModal(false)} style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer' }}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div style={{
+              background: 'rgba(139, 92, 246, 0.05)',
+              border: '1px solid rgba(139, 92, 246, 0.1)',
+              borderRadius: '10px',
+              padding: '0.875rem 1rem',
+              marginBottom: '1.25rem',
+            }}>
+              <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>
+                Mapping to user:
+              </p>
+              <p style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                {users.find(u => u.id === mappingUserId)?.full_name || 'Unknown'} — {users.find(u => u.id === mappingUserId)?.email}
+              </p>
+            </div>
+
+            <div className="form-group">
+              <label className="label">Search & Select Person *</label>
+              <input
+                type="text"
+                className="input-field"
+                placeholder="Search by name, mobile, or village..."
+                value={personSearch}
+                onChange={(e) => setPersonSearch(e.target.value)}
+                style={{ marginBottom: '0.5rem' }}
+                id="map-person-search"
+              />
+              <select
+                className="input-field"
+                value={selectedPersonId}
+                onChange={(e) => setSelectedPersonId(e.target.value)}
+                size={5}
+                style={{ minHeight: '150px' }}
+                id="map-person-select"
+              >
+                {filteredPersonsForModal.length === 0 ? (
+                  <option disabled>No unmapped persons found</option>
+                ) : (
+                  filteredPersonsForModal.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.full_name}{p.mobile ? ` • ${p.mobile}` : ''}{p.village ? ` • ${p.village}` : ''}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
+
+            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '0.5rem' }}>
+              This will link the selected person&apos;s assignments (imported from PDF) to this user account.
+            </p>
+
+            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
+              <button
+                className="btn-primary"
+                style={{ flex: 1 }}
+                onClick={handleMapPerson}
+                disabled={!selectedPersonId}
+                id="confirm-map-person-btn"
+              >
+                <Link2 size={16} />
+                Confirm Mapping
+              </button>
+              <button className="btn-secondary" onClick={() => setShowMapModal(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -11,6 +11,7 @@ import {
   User,
   Search,
   X,
+  Link2,
 } from 'lucide-react';
 
 export default function Assignments() {
@@ -37,7 +38,7 @@ export default function Assignments() {
       const [assignRes, workRes, userRes] = await Promise.all([
         supabase
           .from('assignments')
-          .select('*, works(*), profiles!assignments_user_id_fkey(*)')
+          .select('*, works(*), profiles!assignments_user_id_fkey(*), persons(*)')
           .order('assigned_at', { ascending: false }),
         supabase.from('works').select('*').eq('status', 'open').order('work_date'),
         supabase.from('profiles').select('*').order('full_name'),
@@ -167,7 +168,9 @@ export default function Assignments() {
     return (
       a.works?.title?.toLowerCase().includes(search) ||
       a.profiles?.full_name?.toLowerCase().includes(search) ||
-      a.profiles?.email?.toLowerCase().includes(search)
+      a.profiles?.email?.toLowerCase().includes(search) ||
+      a.persons?.full_name?.toLowerCase().includes(search) ||
+      a.persons?.mobile?.includes(search)
     );
   });
 
@@ -243,11 +246,16 @@ export default function Assignments() {
                         )}
                         <div>
                           <div style={{ fontWeight: 500, color: 'var(--color-text-primary)', fontSize: '0.8125rem' }}>
-                            {a.profiles?.full_name || 'Unknown'}
+                            {a.profiles?.full_name || a.persons?.full_name || 'Unknown'}
                           </div>
                           <div style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)' }}>
-                            {a.profiles?.email}
+                            {a.profiles?.email || (a.persons?.mobile ? `📱 ${a.persons.mobile}` : '')}
                           </div>
+                          {a.persons && !a.profiles && (
+                            <div style={{ fontSize: '0.625rem', color: 'var(--color-warning)', display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.125rem' }}>
+                              <Link2 size={10} /> PDF Import (unmapped)
+                            </div>
+                          )}
                         </div>
                       </div>
                     </td>

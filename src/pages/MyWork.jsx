@@ -23,14 +23,45 @@ export default function MyWork() {
 
   async function fetchMyWork() {
     try {
-      const { data, error } = await supabase
+      // Fetch assignments directly assigned to this user
+      const { data: directAssignments, error: directError } = await supabase
         .from('assignments')
         .select('*, works(*)')
         .eq('user_id', profile.id)
         .order('assigned_at', { ascending: false });
 
-      if (error) throw error;
-      setAssignments(data || []);
+      if (directError) throw directError;
+
+      // Also fetch assignments linked via person mapping
+      // (person.mapped_profile_id = current user, but user_id not yet set on assignment)
+      const { data: mappedPersons } = await supabase
+        .from('persons')
+        .select('id')
+        .eq('mapped_profile_id', profile.id);
+
+      let personAssignments = [];
+      if (mappedPersons && mappedPersons.length > 0) {
+        const personIds = mappedPersons.map((p) => p.id);
+        const { data: pAssignments } = await supabase
+          .from('assignments')
+          .select('*, works(*)')
+          .in('person_id', personIds)
+          .is('user_id', null)
+          .order('assigned_at', { ascending: false });
+
+        personAssignments = pAssignments || [];
+      }
+
+      // Merge and deduplicate (by assignment id)
+      const allAssignments = [...(directAssignments || [])];
+      const existingIds = new Set(allAssignments.map((a) => a.id));
+      for (const pa of personAssignments) {
+        if (!existingIds.has(pa.id)) {
+          allAssignments.push(pa);
+        }
+      }
+
+      setAssignments(allAssignments);
     } catch (err) {
       toast.error('Failed to load your work');
       console.error(err);

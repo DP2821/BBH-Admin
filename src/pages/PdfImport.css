@@ -1,0 +1,241 @@
+.pdf-import-zone {
+  border: 2px dashed rgba(139, 92, 246, 0.3);
+  border-radius: 16px;
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(139, 92, 246, 0.03);
+  position: relative;
+}
+
+.pdf-import-zone:hover,
+.pdf-import-zone.drag-over {
+  border-color: var(--color-primary);
+  background: rgba(139, 92, 246, 0.08);
+  transform: translateY(-2px);
+}
+
+.pdf-import-zone .upload-icon {
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+  opacity: 0.7;
+}
+
+.pdf-import-zone h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.pdf-import-zone p {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.pdf-import-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Preview Section */
+.preview-section {
+  margin-top: 1.5rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.preview-header h2 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.preview-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.preview-meta-item {
+  background: rgba(139, 92, 246, 0.05);
+  border: 1px solid rgba(139, 92, 246, 0.1);
+  border-radius: 10px;
+  padding: 0.875rem 1rem;
+}
+
+.preview-meta-item label {
+  display: block;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+  margin-bottom: 0.375rem;
+  font-weight: 600;
+}
+
+.preview-meta-item .value {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.preview-meta-item .value.missing {
+  color: var(--color-warning);
+  font-style: italic;
+}
+
+.preview-meta-item input,
+.preview-meta-item select {
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+/* Persons Table in Preview */
+.persons-section {
+  margin-top: 1.25rem;
+}
+
+.persons-section h3 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.persons-section .badge-count {
+  background: var(--color-primary);
+  color: white;
+  padding: 0.125rem 0.5rem;
+  border-radius: 99px;
+  font-size: 0.75rem;
+}
+
+/* Warning Banner */
+.parse-warnings {
+  background: rgba(249, 115, 22, 0.08);
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  border-radius: 10px;
+  padding: 0.875rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.parse-warnings h4 {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-warning);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.parse-warnings ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.parse-warnings li {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  padding: 0.25rem 0;
+  padding-left: 1rem;
+  position: relative;
+}
+
+.parse-warnings li::before {
+  content: '⚠';
+  position: absolute;
+  left: 0;
+}
+
+/* Import Actions */
+.import-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Import History */
+.import-history {
+  margin-top: 2rem;
+}
+
+.import-history h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Editable table cells */
+.editable-cell {
+  position: relative;
+}
+
+.editable-cell input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  color: var(--color-text-primary);
+  font-size: 0.8125rem;
+  width: 100%;
+  min-width: 80px;
+}
+
+.editable-cell input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.15);
+}
+
+/* Progress overlay */
+.import-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+}
+
+.import-progress p {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.progress-bar {
+  width: 100%;
+  max-width: 300px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-info));
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}

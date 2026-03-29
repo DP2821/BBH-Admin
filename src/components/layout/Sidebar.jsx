@@ -9,6 +9,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Shield,
+  FileUp,
+  UserCheck,
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -18,6 +20,8 @@ const adminLinks = [
   { to: '/assignments', icon: ClipboardList, label: 'Assignments' },
   { to: '/requests', icon: HandHeart, label: 'Availability Requests' },
   { to: '/users', icon: Users, label: 'User Management' },
+  { to: '/pdf-import', icon: FileUp, label: 'PDF Import' },
+  { to: '/persons', icon: UserCheck, label: 'Persons' },
 ];
 
 const userLinks = [

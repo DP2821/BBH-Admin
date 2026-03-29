@@ -9,6 +9,8 @@ import WorkManagement from './pages/WorkManagement';
 import Assignments from './pages/Assignments';
 import AvailabilityRequests from './pages/AvailabilityRequests';
 import UserManagement from './pages/UserManagement';
+import PdfImport from './pages/PdfImport';
+import PersonManagement from './pages/PersonManagement';
 import MyWork from './pages/MyWork';
 import RequestAvailability from './pages/RequestAvailability';
 
@@ -63,6 +65,22 @@ export default function App() {
                 element={
                   <ProtectedRoute adminOnly>
                     <UserManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="pdf-import"
+                element={
+                  <ProtectedRoute adminOnly>
+                    <PdfImport />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="persons"
+                element={
+                  <ProtectedRoute adminOnly>
+                    <PersonManagement />
                   </ProtectedRoute>
                 }
               />
