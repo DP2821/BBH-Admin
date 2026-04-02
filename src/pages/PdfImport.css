@@ -239,3 +239,32 @@
   border-radius: 3px;
   transition: width 0.3s ease;
 }
+
+/* Block Cards (multi-committee) */
+.block-card {
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.block-card.selected {
+  border-color: rgba(139, 92, 246, 0.2);
+}
+
+.block-card.deselected {
+  opacity: 0.55;
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.block-card:hover {
+  opacity: 1;
+}
+
+.block-header:hover {
+  opacity: 0.85;
+}
+
+.empty-hint {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+  font-style: italic;
+}

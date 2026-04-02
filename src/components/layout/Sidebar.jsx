@@ -20,7 +20,7 @@ const adminLinks = [
   { to: '/assignments', icon: ClipboardList, label: 'Assignments' },
   { to: '/requests', icon: HandHeart, label: 'Availability Requests' },
   { to: '/users', icon: Users, label: 'User Management' },
-  { to: '/pdf-import', icon: FileUp, label: 'PDF Import' },
+  { to: '/pdf-import', icon: FileUp, label: 'Data Import' },
   { to: '/persons', icon: UserCheck, label: 'Persons' },
 ];
 
