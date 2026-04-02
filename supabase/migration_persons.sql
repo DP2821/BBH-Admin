@@ -21,6 +21,9 @@ CREATE TABLE IF NOT EXISTS public.persons (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Safety: ensure updated_at exists even if table was created earlier
+ALTER TABLE public.persons ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+
 -- Enable RLS
 ALTER TABLE public.persons ENABLE ROW LEVEL SECURITY;
 
@@ -95,6 +98,21 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_assignments_work_user
 CREATE UNIQUE INDEX IF NOT EXISTS idx_assignments_work_person
   ON public.assignments(work_id, person_id)
   WHERE person_id IS NOT NULL;
+
+
+-- =====================================================
+-- 2b. MAKE WORKS COLUMNS NULLABLE
+-- Allow importing committees without date/time set yet.
+-- Admin can fill these in later.
+-- =====================================================
+ALTER TABLE public.works
+  ALTER COLUMN work_date DROP NOT NULL;
+
+ALTER TABLE public.works
+  ALTER COLUMN start_time DROP NOT NULL;
+
+ALTER TABLE public.works
+  ALTER COLUMN end_time DROP NOT NULL;
 
 
 -- =====================================================

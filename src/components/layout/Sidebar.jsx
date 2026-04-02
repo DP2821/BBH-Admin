@@ -11,6 +11,7 @@ import {
   Shield,
   FileUp,
   UserCheck,
+  X,
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -30,12 +31,12 @@ const userLinks = [
   { to: '/request-availability', icon: HandHeart, label: 'Request Availability' },
 ];
 
-export default function Sidebar({ collapsed, onToggle }) {
-  const { isAdmin, profile } = useAuth();
+export default function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }) {
+  const { isAdmin } = useAuth();
   const links = isAdmin ? adminLinks : userLinks;
 
   return (
-    <aside className={`sidebar ${collapsed ? 'sidebar-collapsed' : ''}`}>
+    <aside className={`sidebar ${collapsed ? 'sidebar-collapsed' : ''} ${mobileOpen ? 'sidebar-mobile-open' : ''}`}>
       <div className="sidebar-header">
         {!collapsed && (
           <div className="sidebar-brand">
@@ -44,8 +45,15 @@ export default function Sidebar({ collapsed, onToggle }) {
           </div>
         )}
         {collapsed && <Shield size={24} className="brand-icon-solo" />}
-        <button className="sidebar-toggle" onClick={onToggle} aria-label="Toggle sidebar">
+
+        {/* Desktop toggle */}
+        <button className="sidebar-toggle desktop-only" onClick={onToggle} aria-label="Toggle sidebar">
           {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+        </button>
+
+        {/* Mobile close button */}
+        <button className="sidebar-toggle mobile-only" onClick={onMobileClose} aria-label="Close sidebar">
+          <X size={18} />
         </button>
       </div>
 
@@ -56,6 +64,7 @@ export default function Sidebar({ collapsed, onToggle }) {
             to={to}
             className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
             title={collapsed ? label : undefined}
+            onClick={onMobileClose}
           >
             <Icon size={20} />
             {!collapsed && <span>{label}</span>}

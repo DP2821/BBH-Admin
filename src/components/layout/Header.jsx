@@ -1,13 +1,16 @@
 import { useAuth } from '../../contexts/AuthContext';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, User, Menu } from 'lucide-react';
 import './Header.css';
 
-export default function Header() {
+export default function Header({ onMenuClick }) {
   const { user, profile, signOut, isAdmin } = useAuth();
 
   return (
     <header className="app-header">
       <div className="header-left">
+        <button className="hamburger-btn" onClick={onMenuClick} aria-label="Open menu">
+          <Menu size={22} />
+        </button>
         <h2 className="header-greeting">
           Jai Shree Krishna 🙏
           {profile?.full_name && (
@@ -32,7 +35,7 @@ export default function Header() {
         </div>
         <button className="btn-secondary btn-sm" onClick={signOut} id="logout-btn">
           <LogOut size={16} />
-          Logout
+          <span className="logout-label">Logout</span>
         </button>
       </div>
     </header>

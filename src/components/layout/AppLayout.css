@@ -16,3 +16,22 @@
   padding: 1.5rem;
   overflow-y: auto;
 }
+
+/* Mobile overlay */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 199;
+  animation: fadeIn 0.2s ease;
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .app-main {
+    margin-left: 0 !important;
+  }
+  .app-content {
+    padding: 1rem 0.75rem;
+  }
+}
